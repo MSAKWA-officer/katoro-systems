@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://backend-kappa-rouge-70.vercel.app/api',
+  baseURL: import.meta.env.VITE_API_URL || 'https://katoro-backend.onrender.com/api',
 });
 
 // Attach the JWT token to every request if we have one
