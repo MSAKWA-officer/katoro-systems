@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import DashboardHome from './pages/DashboardHome';
 import StudentList from './features/students/StudentList';
 import StudentForm from './features/students/StudentForm';
+import StudentTransferForm from './features/students/StudentTransferForm';
 import StudentView from './features/students/StudentView';
 import StudentReportCard from './features/students/StudentReportCard';
 import MyAttendance from './features/students/MyAttendance';
@@ -15,9 +16,6 @@ import ClassList from './features/classes/ClassList';
 import SubjectList from './features/subjects/SubjectList';
 import SubjectCreate from './features/subjects/SubjectCreate';
 import SubjectUpdate from './features/subjects/SubjectUpdate';
-import SchoolSubjectList from './features/schoolSubjects/SchoolSubjectList';
-import SchoolSubjectCreate from './features/schoolSubjects/SchoolSubjectCreate';
-import SchoolSubjectUpdate from './features/schoolSubjects/SchoolSubjectUpdate';
 import TeacherList from './features/teachers/TeacherList';
 import TeacherCreate from './features/teachers/TeacherCreate';
 import TeacherUpdate from './features/teachers/TeacherUpdate';
@@ -40,6 +38,7 @@ import OLevelResultView from './features/results/olevel/ResultView';
 import AttendanceList from './features/attendance/AttendanceList';
 import EnrollmentList from './features/enrollments/EnrollmentList';
 import EnrollmentCreate from './features/enrollments/EnrollmentCreate';
+import EnrollTransferredStudent from './features/enrollments/EnrollTransferredStudent';
 import EnrollmentUpdate from './features/enrollments/EnrollmentUpdate';
 import EnrollmentView from './features/enrollments/EnrollmentView';
 import ReportsList from './features/reports/ReportsList';
@@ -88,6 +87,14 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="students/add-transfer"
+              element={
+                <ProtectedRoute roles={['admin', 'headteacher', 'staff']}>
+                  <StudentTransferForm />
+                </ProtectedRoute>
+              }
+            />
             <Route path="students/:id" element={<StudentView />} />
             <Route
               path="students/:id/edit"
@@ -129,30 +136,6 @@ export default function App() {
               element={
                 <ProtectedRoute roles={['admin', 'headteacher']}>
                   <SubjectUpdate />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="school-subjects"
-              element={
-                <ProtectedRoute roles={['admin', 'headteacher', 'staff']}>
-                  <SchoolSubjectList />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="school-subjects/add"
-              element={
-                <ProtectedRoute roles={['admin', 'headteacher']}>
-                  <SchoolSubjectCreate />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="school-subjects/:id/edit"
-              element={
-                <ProtectedRoute roles={['admin', 'headteacher']}>
-                  <SchoolSubjectUpdate />
                 </ProtectedRoute>
               }
             />
@@ -370,6 +353,14 @@ export default function App() {
               element={
                 <ProtectedRoute roles={['admin', 'headteacher']}>
                   <EnrollmentCreate />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="enrollments/transferred"
+              element={
+                <ProtectedRoute roles={['admin', 'headteacher']}>
+                  <EnrollTransferredStudent />
                 </ProtectedRoute>
               }
             />

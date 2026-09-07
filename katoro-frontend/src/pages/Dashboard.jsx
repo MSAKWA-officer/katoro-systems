@@ -239,7 +239,7 @@ export default function Dashboard() {
 
         <div className="min-w-0 leading-tight">
           <p className="truncate text-base font-extrabold uppercase tracking-wide sm:text-lg">
-            Ubungo Islamic High School
+            Katoro Secondary School
           </p>
           <p className="hidden text-xs font-medium uppercase tracking-wider text-white/80 sm:block">
             Student Records Management System
@@ -358,7 +358,7 @@ export default function Dashboard() {
           </main>
 
           <footer className="border-t border-slate-200 bg-white px-6 py-3 text-center text-xs text-black">
-            © 2024–{new Date().getFullYear()} Student Records System. Built for schools in Tanzania.
+            © –{new Date().getFullYear()} Student Records System. Built for schools in Tanzania.
           </footer>
         </div>
       </div>
