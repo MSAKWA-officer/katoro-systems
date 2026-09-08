@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import DashboardHome from './pages/DashboardHome';
 import StudentList from './features/students/StudentList';
 import StudentForm from './features/students/StudentForm';
+import StudentTransferForm from './features/students/StudentTransferForm';
 import StudentView from './features/students/StudentView';
 import StudentReportCard from './features/students/StudentReportCard';
 import MyAttendance from './features/students/MyAttendance';
@@ -40,6 +41,7 @@ import OLevelResultView from './features/results/olevel/ResultView';
 import AttendanceList from './features/attendance/AttendanceList';
 import EnrollmentList from './features/enrollments/EnrollmentList';
 import EnrollmentCreate from './features/enrollments/EnrollmentCreate';
+import EnrollTransferredStudent from './features/enrollments/EnrollTransferredStudent';
 import EnrollmentUpdate from './features/enrollments/EnrollmentUpdate';
 import EnrollmentView from './features/enrollments/EnrollmentView';
 import ReportsList from './features/reports/ReportsList';
@@ -89,6 +91,14 @@ export default function App() {
               }
             />
             <Route path="students/:id" element={<StudentView />} />
+            <Route
+              path="students/add-transfer"
+              element={
+                <ProtectedRoute roles={['admin', 'headteacher', 'staff']}>
+                  <StudentTransferForm />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="students/:id/edit"
               element={
@@ -370,6 +380,14 @@ export default function App() {
               element={
                 <ProtectedRoute roles={['admin', 'headteacher']}>
                   <EnrollmentCreate />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="enrollments/transferred"
+              element={
+                <ProtectedRoute roles={['admin', 'headteacher']}>
+                  <EnrollTransferredStudent />
                 </ProtectedRoute>
               }
             />
