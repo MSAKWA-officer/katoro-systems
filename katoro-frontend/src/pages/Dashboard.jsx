@@ -107,8 +107,7 @@ function buildStudentNavConfig(user) {
   const sid = user?.student_id;
   return [
     { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-    { to: `/dashboard/students/${sid}/report-card`, label: 'My Report Card', icon: ClipboardList },
-    { to: `/dashboard/students/${sid}/result-slip`, label: 'My Result Slip', icon: ListChecks },
+    { to: `/dashboard/students/${sid}/report-card`, label: 'Result Report', icon: ClipboardList },
     { to: `/dashboard/students/${sid}/attendance`, label: 'My Attendance', icon: CalendarCheck2 },
     { to: '/dashboard/announcements', label: 'Announcements', icon: Megaphone },
   ];
