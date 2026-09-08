@@ -7,7 +7,7 @@ import { classesApi } from '../classes/classesApi';
 import { academicYearsApi } from '../academicYears/academicYearsApi';
 import { classSubjectsApi } from '../classSubjects/classSubjectsApi';
 
-const emptyForm = { student_id: '', school_class_id: '', stream_id: '', academic_year_id: '', subject_ids: [] };
+const emptyForm = { school_class_id: '', stream_id: '', academic_year_id: '', subject_ids: [] };
 
 export default function EnrollmentCreate() {
   const navigate = useNavigate();
@@ -19,6 +19,10 @@ export default function EnrollmentCreate() {
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+
+  // Every student ticked in the checklist below — enrolling submits one
+  // enrollment per id here, all into the same class/stream/year/subjects.
+  const [selectedStudentIds, setSelectedStudentIds] = useState([]);
 
   // The pool of students allowed for the currently-selected class: brand
   // new students for an entry-level class (e.g. Form 1 / Standard 1), or
@@ -48,7 +52,7 @@ export default function EnrollmentCreate() {
   // year changes, and reset whichever student was already picked (it may
   // no longer be a valid choice for the new class/year).
   useEffect(() => {
-    setForm((prev) => ({ ...prev, student_id: '' }));
+    setSelectedStudentIds([]);
     setStudentSearch('');
     if (form.school_class_id) {
       setLoadingEligible(true);
@@ -126,11 +130,6 @@ export default function EnrollmentCreate() {
     [classes, form.school_class_id]
   );
 
-  const selectedStudent = useMemo(
-    () => eligibleStudents.find((s) => String(s.id) === String(form.student_id)),
-    [eligibleStudents, form.student_id]
-  );
-
   const visibleStudents = useMemo(() => {
     const term = studentSearch.trim().toLowerCase();
     if (!term) return eligibleStudents;
@@ -147,16 +146,34 @@ export default function EnrollmentCreate() {
   function handleFormChange(e) {
     const { name, value } = e.target;
     if (name === 'school_class_id') {
-      setForm({ ...form, school_class_id: value, stream_id: '', subject_ids: [], student_id: '' });
+      setForm({ ...form, school_class_id: value, stream_id: '', subject_ids: [] });
+      setSelectedStudentIds([]);
     } else if (name === 'academic_year_id') {
-      setForm({ ...form, academic_year_id: value, subject_ids: [], student_id: '' });
+      setForm({ ...form, academic_year_id: value, subject_ids: [] });
+      setSelectedStudentIds([]);
     } else {
       setForm({ ...form, [name]: value });
     }
   }
 
-  function selectStudent(id) {
-    setForm((prev) => ({ ...prev, student_id: String(id) }));
+  function toggleStudent(id) {
+    setSelectedStudentIds((prev) => {
+      const key = String(id);
+      return prev.includes(key) ? prev.filter((s) => s !== key) : [...prev, key];
+    });
+  }
+
+  // Selects/deselects every student currently visible (i.e. matching the
+  // search box) — not the full eligible pool if a search filter is active,
+  // so "select all" respects whatever the admin has searched for.
+  function toggleSelectAllVisible() {
+    const visibleIds = visibleStudents.map((s) => String(s.id));
+    const allVisibleSelected = visibleIds.every((id) => selectedStudentIds.includes(id));
+    if (allVisibleSelected) {
+      setSelectedStudentIds((prev) => prev.filter((id) => !visibleIds.includes(id)));
+    } else {
+      setSelectedStudentIds((prev) => Array.from(new Set([...prev, ...visibleIds])));
+    }
   }
 
   function toggleSubject(subjectId) {
@@ -176,23 +193,44 @@ export default function EnrollmentCreate() {
     e.preventDefault();
     setError('');
 
-    if (!form.student_id) {
-      setError('Select a student to enroll.');
+    if (selectedStudentIds.length === 0) {
+      setError('Select at least one student to enroll.');
       return;
     }
     if (form.subject_ids.length === 0) {
-      setError('Select at least one subject for this student.');
+      setError('Select at least one subject for these students.');
       return;
     }
 
     setSaving(true);
     try {
-      const payload = { ...form, stream_id: form.stream_id || null };
-      await enrollmentsApi.create(payload);
+      const base = { ...form, stream_id: form.stream_id || null };
+      delete base.subject_ids; // re-added per-student below alongside subject_ids
+
+      const results = await Promise.allSettled(
+        selectedStudentIds.map((studentId) =>
+          enrollmentsApi.create({ ...base, subject_ids: form.subject_ids, student_id: studentId })
+        )
+      );
+
+      const failedCount = results.filter((r) => r.status === 'rejected').length;
+      const succeededCount = results.length - failedCount;
 
       const enrolledClass = classes.find((c) => String(c.id) === String(form.school_class_id));
-      setLastEnrolled(enrolledClass ? { classId: enrolledClass.id, className: enrolledClass.name } : null);
+      setLastEnrolled(
+        enrolledClass
+          ? { classId: enrolledClass.id, className: enrolledClass.name, succeededCount, failedCount }
+          : null
+      );
+
+      if (failedCount > 0) {
+        setError(
+          `${succeededCount} student(s) enrolled, but ${failedCount} failed (they may already be enrolled or invalid). Re-select and try again for the ones that failed.`
+        );
+      }
+
       setForm(emptyForm);
+      setSelectedStudentIds([]);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to save the enrollment.');
     } finally {
@@ -212,10 +250,11 @@ export default function EnrollmentCreate() {
           lives inside one card/div with a single background. */}
       <div className="mt-3 max-w-3xl overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
         <div className="border-b border-slate-100 px-6 py-5">
-          <h2 className="text-lg font-semibold text-black">Enroll Student in a Class</h2>
+          <h2 className="text-lg font-semibold text-black">Enroll Students in a Class</h2>
           <p className="mt-1 text-sm text-black">
             Pick a class/stream and academic year first — the student list below will narrow to only the
-            students who can be enrolled there — then choose the subjects they actually take.
+            students who can be enrolled there — then tick one, several, or Select All, and choose the
+            subjects they take.
           </p>
         </div>
 
@@ -224,7 +263,12 @@ export default function EnrollmentCreate() {
         {lastEnrolled && (
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-emerald-50 px-6 py-4">
             <p className="text-sm text-black">
-              Student enrolled successfully in <span className="font-semibold">{lastEnrolled.className}</span>.
+              {lastEnrolled.succeededCount} student{lastEnrolled.succeededCount === 1 ? '' : 's'} enrolled
+              successfully in <span className="font-semibold">{lastEnrolled.className}</span>
+              {lastEnrolled.failedCount > 0 && (
+                <span className="text-red-700"> ({lastEnrolled.failedCount} failed)</span>
+              )}
+              .
             </p>
             <div className="flex items-center gap-3">
               <Link
@@ -302,7 +346,20 @@ export default function EnrollmentCreate() {
           {/* Student picker — only the students eligible for the class picked
               above show up here, with their own search bar. */}
           <div className="mt-4">
-            <label className="mb-2 block text-sm font-medium text-black">Student *</label>
+            <div className="mb-2 flex items-center justify-between">
+              <label className="block text-sm font-medium text-black">Students *</label>
+              {form.school_class_id && visibleStudents.length > 0 && (
+                <button
+                  type="button"
+                  onClick={toggleSelectAllVisible}
+                  className="text-xs font-semibold text-blue-600 hover:underline"
+                >
+                  {visibleStudents.every((s) => selectedStudentIds.includes(String(s.id)))
+                    ? 'Deselect All'
+                    : `Select All${studentSearch ? ' (matching search)' : ' Unenrolled'}`}
+                </button>
+              )}
+            </div>
 
             {!form.school_class_id ? (
               <p className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-black">
@@ -351,11 +408,10 @@ export default function EnrollmentCreate() {
                         <li key={s.id}>
                           <label className="flex cursor-pointer items-center gap-3 px-3 py-2 text-sm text-black hover:bg-slate-50">
                             <input
-                              type="radio"
-                              name="student_id"
-                              checked={String(form.student_id) === String(s.id)}
-                              onChange={() => selectStudent(s.id)}
-                              className="h-4 w-4 border-slate-300 text-blue-600 focus:ring-blue-500"
+                              type="checkbox"
+                              checked={selectedStudentIds.includes(String(s.id))}
+                              onChange={() => toggleStudent(s.id)}
+                              className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                             />
                             <span className="flex-1">
                               {studentName(s)}{' '}
@@ -368,10 +424,10 @@ export default function EnrollmentCreate() {
                   )}
                 </div>
 
-                {selectedStudent && (
+                {selectedStudentIds.length > 0 && (
                   <div className="border-t border-slate-100 bg-blue-50 px-3 py-2 text-xs text-black">
-                    Selected: <span className="font-semibold">{studentName(selectedStudent)}</span> (
-                    {selectedStudent.admission_number})
+                    <span className="font-semibold">{selectedStudentIds.length}</span> student
+                    {selectedStudentIds.length === 1 ? '' : 's'} selected
                   </div>
                 )}
               </div>
@@ -380,7 +436,7 @@ export default function EnrollmentCreate() {
 
           <div className="mt-4">
             <label className="mb-2 block text-sm font-medium text-black">
-              Subjects This Student Takes *
+              Subjects These Students Take *
             </label>
             {!form.school_class_id || !form.academic_year_id ? (
               <p className="text-xs text-black">Select a class and academic year first.</p>
@@ -414,7 +470,7 @@ export default function EnrollmentCreate() {
               disabled={saving}
               className="rounded-md bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:opacity-60"
             >
-              {saving ? 'Saving...' : 'Save Enrollment'}
+              {saving ? 'Saving...' : 'Enroll Selected Students'}
             </button>
             <Link to="/dashboard/enrollments" className="text-sm text-black hover:underline">
               Cancel
