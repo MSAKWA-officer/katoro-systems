@@ -346,7 +346,7 @@ export default function StudentReportCard() {
               <div>
                 <p className="result-slip-school-name" style={{ fontSize: '14px' }}>{SCHOOL_NAME}</p>
                 <p className="result-slip-school-meta">
-                  P.O. Box 4295, Mbeya City Council, MBEYA · 
+                  P.O. Box 4295, GEITA City Council, GEITA · 
                 </p>
               </div>
             </div>

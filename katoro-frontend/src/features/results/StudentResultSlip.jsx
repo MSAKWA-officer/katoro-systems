@@ -206,7 +206,7 @@ export default function StudentResultSlip() {
               <div>
             
                 <p className="result-slip-school-meta">
-                  P.O. Box 000, Mbeya, Tanzania · Tel: +255 000 000 000 · info@school.example
+                  P.O. Box 000, GEITA, Tanzania · Tel: +255 000 000 000 · info@school.example
                 </p>
               </div>
             </div>

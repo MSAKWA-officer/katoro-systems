@@ -12,7 +12,7 @@ import { exportToExcel } from '../../utils/exportToExcel';
 // see StudentResultSlip.jsx / StudentReportCard.jsx.)
 const OFFICE_LINE_1 = "PRESIDENT'S OFFICE";
 const OFFICE_LINE_2 = 'REGIONAL ADMINISTRATION AND LOCAL GOVERNMENT';
-const REGION_LINE = 'MBEYA CITY, MBEYA';
+const REGION_LINE = 'GEITA CITY, GEITA';
 const SCHOOL_NAME = 'KALANGALALA SECONDARY SCHOOL';
 
 // Order the division columns/rows are shown in, left to right / top to bottom.

@@ -13,7 +13,7 @@ import { examsApi } from '../exams/examsApi';
 //
 // {
 //   meta: {
-//     school_name, region_line,      // e.g. "MBEYA CITY, MBEYA"
+//     school_name, region_line,      // e.g. "GEITA CITY, GEITA"
 //     class_name, exam_name, academic_year, generated_at,
 //   },
 //   divisionSummary: [

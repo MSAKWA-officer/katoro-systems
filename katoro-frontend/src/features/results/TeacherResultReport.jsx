@@ -10,7 +10,7 @@ import { exportToExcel } from '../../utils/exportToExcel';
 // Change these to match your school if it differs from KALANGALALA.
 const OFFICE_LINE_1 = "PRESIDENT'S OFFICE";
 const OFFICE_LINE_2 = 'REGIONAL ADMINISTRATION AND LOCAL GOVERNMENT';
-const REGION_LINE = 'MBEYA CITY, MBEYA';
+const REGION_LINE = 'GEITA CITY, GEITA';
 const SCHOOL_NAME = 'KALANGALALA SECONDARY SCHOOL';
 
 const GRADE_COLUMNS = ['A', 'B', 'C', 'D', 'F'];
