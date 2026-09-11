@@ -5,7 +5,7 @@ import { academicYearsApi } from '../academicYears/academicYearsApi';
 import { termsApi } from '../terms/termsApi';
 import { examsApi } from '../exams/examsApi';
 
-const SCHOOL_NAME = 'LUPETA SECONDARY SCHOOL';
+const SCHOOL_NAME = 'KALANGALALA SECONDARY SCHOOL';
 const GRADE_POINTS = { A: 1, B: 2, C: 3, D: 4, F: 5 };
 const GRADE_REMARKS = { A: 'Excellent', B: 'Very Good', C: 'Good', D: 'Satisfactory', F: 'Fail' };
 

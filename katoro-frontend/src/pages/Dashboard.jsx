@@ -243,7 +243,7 @@ export default function Dashboard() {
 
         <div className="min-w-0 leading-tight">
           <p className="truncate text-base font-extrabold uppercase tracking-wide sm:text-lg">
-            Lupeta Secondary School
+            KALANGALALA Secondary School
           </p>
           <p className="hidden text-xs font-medium uppercase tracking-wider text-white/80 sm:block">
             Student Records Management System

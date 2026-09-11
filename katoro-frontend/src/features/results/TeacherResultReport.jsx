@@ -7,11 +7,11 @@ import { exportToExcel } from '../../utils/exportToExcel';
 
 // School letterhead — kept consistent with the other printable reports
 // (ClassDivisionReportPage.jsx, StudentResultSlip.jsx, StudentReportCard.jsx).
-// Change these to match your school if it differs from Lupeta.
+// Change these to match your school if it differs from KALANGALALA.
 const OFFICE_LINE_1 = "PRESIDENT'S OFFICE";
 const OFFICE_LINE_2 = 'REGIONAL ADMINISTRATION AND LOCAL GOVERNMENT';
 const REGION_LINE = 'MBEYA CITY, MBEYA';
-const SCHOOL_NAME = 'LUPETA SECONDARY SCHOOL';
+const SCHOOL_NAME = 'KALANGALALA SECONDARY SCHOOL';
 
 const GRADE_COLUMNS = ['A', 'B', 'C', 'D', 'F'];
 const DIVISION_COLUMNS = [

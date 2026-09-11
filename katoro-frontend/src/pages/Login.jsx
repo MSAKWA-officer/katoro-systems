@@ -40,7 +40,7 @@ export default function Login() {
           </div>
           <div>
             <h1 className="text-xl font-extrabold uppercase tracking-wide sm:text-2xl">
-              Lupeta Secondary School
+              KALANGALALA Secondary School
             </h1>
             <p className="text-sm uppercase tracking-wide text-white/90 sm:text-base">
               Student Records Management System <span className="text-white/70">{'{ SRMS }'}</span>
@@ -128,7 +128,7 @@ export default function Login() {
             the login form. Year is computed automatically so it's never
             stale. */}
         <div className="border-t border-slate-100 bg-slate-50 px-8 py-4 text-center text-xs text-slate-500">
-          © {new Date().getFullYear()} Lupeta Secondary School. All rights reserved.
+          © {new Date().getFullYear()} KALANGALALA Secondary School. All rights reserved.
         </div>
       </div>
     </div>
