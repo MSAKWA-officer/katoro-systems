@@ -86,6 +86,11 @@ function buildNavConfig() {
           ],
         },
         { to: '/dashboard/reports', label: 'Reports', roles: ['admin', 'headteacher'] },
+        {
+          to: '/dashboard/reports/division/school',
+          label: 'School Division Report',
+          roles: ['admin', 'headteacher'],
+        },
       ],
     },
     { to: '/dashboard/attendance', label: 'Attendance', icon: CalendarCheck2 },
@@ -238,7 +243,7 @@ export default function Dashboard() {
 
         <div className="min-w-0 leading-tight">
           <p className="truncate text-base font-extrabold uppercase tracking-wide sm:text-lg">
-            Katoro Secondary School
+            Lupeta Secondary School
           </p>
           <p className="hidden text-xs font-medium uppercase tracking-wider text-white/80 sm:block">
             Student Records Management System

@@ -8,4 +8,12 @@ export const resultsApi = {
   update: (id, data) => api.put(`/results/${id}`, data),
   remove: (id) => api.delete(`/results/${id}`),
   getExamSlip: (params) => api.get('/results/exam-slip', { params }),
+  // NECTA-style Division Performance reports.
+  // params: { exam_id, school_class_id, stream_id? }
+  getClassReport: (params) => api.get('/results/class-report', { params }),
+  // params: { exam_id }
+  getSchoolReport: (params) => api.get('/results/school-report', { params }),
+  // Teacher/subject performance ranking, best to worst, for one exam.
+  // params: { exam_id }
+  getTeacherReport: (params) => api.get('/results/teacher-report', { params }),
 };

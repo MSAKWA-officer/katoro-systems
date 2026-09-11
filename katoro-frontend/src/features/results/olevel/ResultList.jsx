@@ -188,7 +188,19 @@ export default function ResultList() {
       groups.get(className).push({ student: s, result: resultByStudent.get(s.id) || null });
     }
     return Array.from(groups.entries())
-      .map(([className, items]) => ({ className, items }))
+      .map(([className, items]) => ({
+        className,
+        // Sort students by admission number (e.g. S3137-0001, S3137-0002, ...)
+        // using numeric-aware comparison so the numeric part orders correctly
+        // even without zero-padding (S3137-9 before S3137-10).
+        items: items.slice().sort((a, b) =>
+          String(a.student.admission_number || '').localeCompare(
+            String(b.student.admission_number || ''),
+            undefined,
+            { numeric: true, sensitivity: 'base' }
+          )
+        ),
+      }))
       .sort((a, b) => a.className.localeCompare(b.className));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [students, results, classId, streamId]);

@@ -132,11 +132,23 @@ export default function EnrollmentCreate() {
 
   const visibleStudents = useMemo(() => {
     const term = studentSearch.trim().toLowerCase();
-    if (!term) return eligibleStudents;
-    return eligibleStudents.filter((s) => {
-      const name = studentName(s).toLowerCase();
-      return name.includes(term) || (s.admission_number || '').toLowerCase().includes(term);
-    });
+    const filtered = term
+      ? eligibleStudents.filter((s) => {
+          const name = studentName(s).toLowerCase();
+          return name.includes(term) || (s.admission_number || '').toLowerCase().includes(term);
+        })
+      : eligibleStudents;
+
+    // Always list students by admission number, so "Select All" and the
+    // enrollment order are predictable regardless of the order the API
+    // returned them in. `numeric: true` sorts mixed letter/number admission
+    // numbers correctly (e.g. "S3137-0002" before "S3137-0010").
+    return [...filtered].sort((a, b) =>
+      String(a.admission_number || '').localeCompare(String(b.admission_number || ''), undefined, {
+        numeric: true,
+        sensitivity: 'base',
+      })
+    );
   }, [eligibleStudents, studentSearch]);
 
   function studentName(s) {

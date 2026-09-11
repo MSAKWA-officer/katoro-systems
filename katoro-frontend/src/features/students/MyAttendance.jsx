@@ -73,81 +73,76 @@ export default function MyAttendance() {
         {backLabel}
       </Link>
 
-      {/* Everything for this page — header, date filters, summary boxes and
-          the records table — lives inside one card/div with a single
-          background, separated only by border lines. */}
-      <div className="mt-3 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-        <div className="flex flex-wrap items-end justify-between gap-4 border-b border-slate-100 px-6 py-5">
+      <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-semibold text-slate-900">
+            {user?.role === 'student' ? 'My Attendance' : `${student ? `${student.first_name} ${student.last_name}` : 'Student'}'s Attendance`}
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">Attendance history between the selected dates.</p>
+        </div>
+        <div className="flex flex-wrap items-end gap-3">
           <div>
-            <h2 className="text-xl font-semibold text-slate-900">
-              {user?.role === 'student' ? 'My Attendance' : `${student ? `${student.first_name} ${student.last_name}` : 'Student'}'s Attendance`}
-            </h2>
-            <p className="mt-1 text-sm text-slate-500">Attendance history between the selected dates.</p>
+            <label className="block text-xs font-medium text-slate-500">From</label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="mt-1 rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+            />
           </div>
-          <div className="flex flex-wrap items-end gap-3">
-            <div>
-              <label className="block text-xs font-medium text-slate-500">From</label>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="mt-1 rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500">To</label>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="mt-1 rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
-              />
-            </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-500">To</label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="mt-1 rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+            />
           </div>
         </div>
-
-        {loading && <p className="px-6 py-5 text-sm text-slate-500">Loading...</p>}
-        {error && <p className="px-6 py-5 text-sm text-red-600">{error}</p>}
-
-        {!loading && !error && (
-          <>
-            <div className="grid grid-cols-2 gap-3 border-b border-slate-100 px-6 py-5 sm:grid-cols-4">
-              <SummaryBox label="Present" value={summary.present} color="emerald" />
-              <SummaryBox label="Absent" value={summary.absent} color="red" />
-              <SummaryBox label="Late" value={summary.late} color="amber" />
-              <SummaryBox label="Excused" value={summary.excused} color="slate" />
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
-                  <tr>
-                    <th className="px-6 py-3 font-medium">Date</th>
-                    <th className="px-6 py-3 font-medium">Status</th>
-                    <th className="px-6 py-3 font-medium">Notes</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {records.map((r) => (
-                    <tr key={r.id}>
-                      <td className="px-6 py-3 text-slate-600">{r.date}</td>
-                      <td className="px-6 py-3 font-medium text-slate-900">{STATUS_LABEL[r.status] || r.status}</td>
-                      <td className="px-6 py-3 text-slate-600">{r.notes || '—'}</td>
-                    </tr>
-                  ))}
-                  {records.length === 0 && (
-                    <tr>
-                      <td colSpan="3" className="px-6 py-8 text-center text-slate-400">
-                        No attendance records for this period.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
       </div>
+
+      {loading && <p className="mt-6 text-sm text-slate-500">Loading...</p>}
+      {error && <p className="mt-6 text-sm text-red-600">{error}</p>}
+
+      {!loading && !error && (
+        <>
+          <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <SummaryBox label="Present" value={summary.present} color="emerald" />
+            <SummaryBox label="Absent" value={summary.absent} color="red" />
+            <SummaryBox label="Late" value={summary.late} color="amber" />
+            <SummaryBox label="Excused" value={summary.excused} color="slate" />
+          </div>
+
+          <div className="mt-5 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                <tr>
+                  <th className="px-4 py-3 font-medium">Date</th>
+                  <th className="px-4 py-3 font-medium">Status</th>
+                  <th className="px-4 py-3 font-medium">Notes</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {records.map((r) => (
+                  <tr key={r.id}>
+                    <td className="px-4 py-3 text-slate-600">{r.date}</td>
+                    <td className="px-4 py-3 font-medium text-slate-900">{STATUS_LABEL[r.status] || r.status}</td>
+                    <td className="px-4 py-3 text-slate-600">{r.notes || '—'}</td>
+                  </tr>
+                ))}
+                {records.length === 0 && (
+                  <tr>
+                    <td colSpan="3" className="px-4 py-8 text-center text-slate-400">
+                      No attendance records for this period.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
   );
 }

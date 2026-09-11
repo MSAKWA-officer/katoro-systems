@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Users,
   UserSquare2,
@@ -44,9 +45,9 @@ export default function DashboardHome() {
   const [announcementsLoading, setAnnouncementsLoading] = useState(true);
 
   useEffect(() => {
-    loadAnnouncements();
-    if (isStudent) return; // the school-wide stats overview isn't relevant to a student login
+    if (isStudent) return; // this school-wide overview isn't relevant to a student login
     loadStats();
+    loadAnnouncements();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isStudent]);
 
@@ -130,19 +131,33 @@ export default function DashboardHome() {
   }
 
   if (isStudent) {
+    const sid = user?.student_id;
     return (
-      <div className="sims-card flex flex-col">
+      <div className="sims-card">
         <div className="sims-card-header">
-          <p className="sims-card-title text-black flex items-center gap-2">
-            <Megaphone size={16} />
-            Announcements
-          </p>
+          <p className="sims-card-title">Welcome</p>
         </div>
         <div className="sims-card-body">
           <h1 className="text-lg font-bold text-slate-900">Welcome, {user?.full_name}</h1>
-          <p className="mt-1 text-sm text-slate-500">Use the menu to view your results and attendance.</p>
-          <div className="mt-4">
-            <AnnouncementFeed announcements={announcements} loading={announcementsLoading} />
+          <p className="mt-1 text-sm text-slate-500">
+            Use the menu to view your results and attendance.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              to={`/dashboard/students/${sid}/report-card`}
+              className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500"
+            >
+              My Report Card
+            </Link>
+            <Link to={`/dashboard/students/${sid}/result-slip`} className="sims-btn sims-btn-outline">
+              My Result Slip
+            </Link>
+            <Link
+              to={`/dashboard/students/${sid}/attendance`}
+              className="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              My Attendance
+            </Link>
           </div>
         </div>
       </div>

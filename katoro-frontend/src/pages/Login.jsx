@@ -30,14 +30,21 @@ export default function Login() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4 py-10">
       <div className="w-full max-w-4xl overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg">
-        {/* Heading banner — spans the full width of the card */}
-        <div className="sims-header flex items-center gap-4 px-8 py-6 text-white">
+        {/* Heading banner — spans the full width of the card. Font sizes
+            follow the reference image: the school name is the big, bold
+            headline; the system name sits smaller underneath it; a solid
+            accent line closes off the banner at the bottom. */}
+        <div className="sims-header flex items-center gap-4 border-b-4 border-blue-800 px-8 py-6 text-white">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white/15">
             <img src={logo} alt="System logo" className="h-11 w-11" />
           </div>
           <div>
-            <h1 className="text-lg font-bold tracking-wide sm:text-xl">Student Records Management System</h1>
-            <p className="text-xs text-white/80 sm:text-sm">Sign in to manage your school</p>
+            <h1 className="text-xl font-extrabold uppercase tracking-wide sm:text-2xl">
+              Lupeta Secondary School
+            </h1>
+            <p className="text-sm uppercase tracking-wide text-white/90 sm:text-base">
+              Student Records Management System <span className="text-white/70">{'{ SRMS }'}</span>
+            </p>
           </div>
         </div>
 
@@ -115,6 +122,13 @@ export default function Login() {
               </button>
             </form>
           </div>
+        </div>
+
+        {/* Footer — quiet attribution line at the bottom of the card, below
+            the login form. Year is computed automatically so it's never
+            stale. */}
+        <div className="border-t border-slate-100 bg-slate-50 px-8 py-4 text-center text-xs text-slate-500">
+          © {new Date().getFullYear()} Lupeta Secondary School. All rights reserved.
         </div>
       </div>
     </div>

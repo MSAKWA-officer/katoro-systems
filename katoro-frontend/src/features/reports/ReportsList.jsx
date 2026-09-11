@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
+import { ClipboardList } from 'lucide-react';
 import { classesApi } from '../classes/classesApi';
 import { studentsApi } from '../students/studentsApi';
 import { exportToExcel } from '../../utils/exportToExcel';
@@ -10,6 +11,12 @@ import { smsApi } from '../smsGateways/smsApi';
 // reached from the Reports nav item); when a :classId is present (reached
 // via Reports > Form 1, Form 2, ... in the sidebar) that class is
 // pre-selected and locked, with a breadcrumb back to the class picker.
+//
+// NOTE: the "View Division Report" links below point to
+// /dashboard/reports/division/class/:classId and
+// /dashboard/reports/division/school — the NECTA-style class/school results
+// reports (ClassDivisionReportPage / SchoolDivisionReportPage). Those routes
+// still need to be registered in App.jsx.
 export default function ReportsList() {
   const { classId: routeClassId } = useParams();
   const location = useLocation();
@@ -97,12 +104,27 @@ export default function ReportsList() {
   }
 
   const filteredStudents = useMemo(() => {
-    if (!search.trim()) return students;
-    const q = search.trim().toLowerCase();
-    return students.filter(
-      (s) =>
-        studentName(s).toLowerCase().includes(q) ||
-        String(s.admission_number || '').toLowerCase().includes(q)
+    const base = search.trim()
+      ? students.filter((s) => {
+          const q = search.trim().toLowerCase();
+          return (
+            studentName(s).toLowerCase().includes(q) ||
+            String(s.admission_number || '').toLowerCase().includes(q)
+          );
+        })
+      : students;
+
+    // Sort by admission number so the list/table/print/export/SMS order is
+    // always predictable, regardless of the order students were added or
+    // returned by the API. `localeCompare` with `numeric: true` handles
+    // admission numbers that mix letters and digits correctly (e.g.
+    // "S3137-0002" sorts before "S3137-0010", not after it as plain string
+    // comparison would).
+    return [...base].sort((a, b) =>
+      String(a.admission_number || '').localeCompare(String(b.admission_number || ''), undefined, {
+        numeric: true,
+        sensitivity: 'base',
+      })
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [students, search]);
@@ -139,6 +161,19 @@ export default function ReportsList() {
     }
   }
 
+  function classDivisionReportLink() {
+    const params = new URLSearchParams();
+    if (streamId) params.set('stream_id', streamId);
+    const qs = params.toString();
+    return `/dashboard/reports/division/class/${classId}${qs ? `?${qs}` : ''}`;
+  }
+
+  function classAnalysisReportLink() {
+    const params = new URLSearchParams();
+    params.set('class_id', classId);
+    return `/dashboard/reports/class-analysis?${params.toString()}`;
+  }
+
   return (
     <div className="p-4">
       {/* Everything for this page — breadcrumb, header, class picker,
@@ -155,15 +190,37 @@ export default function ReportsList() {
         )}
 
         {/* Header */}
-        <div className="border-b border-slate-100 px-6 py-5">
-          <h2 className="text-xl font-semibold text-black">
-            {routeClassId ? `${selectedClass?.name || 'Class'} Reports` : 'Reports by Class'}
-          </h2>
-          <p className="mt-1 text-sm text-black">
-            {routeClassId
-              ? `Every student in ${selectedClass?.name || 'this class'}, each with a link to their full results report.`
-              : 'Choose a class below to see all its students, each with a link to their full results report.'}
-          </p>
+        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 px-6 py-5">
+          <div>
+            <h2 className="text-xl font-semibold text-black">
+              {routeClassId ? `${selectedClass?.name || 'Class'} Reports` : 'Reports by Class'}
+            </h2>
+            <p className="mt-1 text-sm text-black">
+              {routeClassId
+                ? `Every student in ${selectedClass?.name || 'this class'}, each with a link to their full results report.`
+                : 'Choose a class below to see all its students, each with a link to their full results report.'}
+            </p>
+          </div>
+          {!routeClassId && (
+            <div className="no-print flex flex-wrap gap-2">
+              <Link
+                to="/dashboard/reports/division/school"
+                className="flex items-center gap-2 rounded-md border border-blue-200 px-3 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
+              >
+                <ClipboardList size={15} /> View School Division Report
+              </Link>
+              {/* Teacher/subject ranking (best to lowest) for one exam —
+                  exam-wide like the School Division Report above, not tied
+                  to a single class, so it lives next to it here rather than
+                  down in the per-class toolbar. */}
+              <Link
+                to="/dashboard/reports/teacher-performance"
+                className="flex items-center gap-2 rounded-md border border-blue-200 px-3 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
+              >
+                <ClipboardList size={15} /> View Teacher Performance Report
+              </Link>
+            </div>
+          )}
         </div>
 
         {loadingClasses && <p className="border-b border-slate-100 px-6 py-4 text-sm text-black">Loading classes...</p>}
@@ -203,6 +260,18 @@ export default function ReportsList() {
                   : ''}
               </h3>
               <div className="no-print flex flex-wrap gap-3">
+                <Link
+                  to={classDivisionReportLink()}
+                  className="flex items-center gap-2 rounded-md border border-blue-200 bg-white px-3 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
+                >
+                  <ClipboardList size={15} /> View Class Division Report
+                </Link>
+                <Link
+                  to={classAnalysisReportLink()}
+                  className="flex items-center gap-2 rounded-md border border-blue-200 bg-white px-3 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
+                >
+                  <ClipboardList size={15} /> View Class Analysis Report
+                </Link>
                 <button
                   onClick={handleExportExcel}
                   disabled={filteredStudents.length === 0}

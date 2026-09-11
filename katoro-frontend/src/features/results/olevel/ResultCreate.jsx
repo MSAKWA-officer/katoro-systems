@@ -190,7 +190,18 @@ export default function ResultCreate() {
       if (mode === 'bulk' && subjectId) params.subject_id = subjectId;
       if (academicYearId) params.academic_year_id = academicYearId;
       const res = await studentsApi.getAll(params);
-      setStudents(res.data.data || []);
+      // Sort by admission number (e.g. S3137-0001, S3137-0002, ...), numeric-aware
+      // so it stays correct even without zero-padding (S3137-9 before S3137-10).
+      // This ordering flows through to the bulk table, the download template,
+      // and the single-student picker/search below.
+      const sorted = (res.data.data || []).slice().sort((a, b) =>
+        String(a.admission_number || '').localeCompare(
+          String(b.admission_number || ''),
+          undefined,
+          { numeric: true, sensitivity: 'base' }
+        )
+      );
+      setStudents(sorted);
     } catch (err) {
       setError('Failed to load students for this class/stream.');
     } finally {

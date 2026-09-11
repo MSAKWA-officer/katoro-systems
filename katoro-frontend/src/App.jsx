@@ -34,6 +34,9 @@ import ExamCreate from './features/exams/ExamCreate';
 import ExamUpdate from './features/exams/ExamUpdate';
 import ClassResultsPage from './features/results/ClassResultsPage';
 import ClassResultSlipsPage from './features/results/ClassResultSlipsPage';
+import ClassDivisionReportPage from './features/results/ClassDivisionReportPage';
+import SchoolDivisionReportPage from './features/results/SchoolDivisionReportPage';
+import ClassAnalysisReportPage from './features/results/ClassAnalysisReportPage';
 import OLevelResultList from './features/results/olevel/ResultList';
 import OLevelResultCreate from './features/results/olevel/ResultCreate';
 import OLevelResultUpdate from './features/results/olevel/ResultUpdate';
@@ -53,6 +56,7 @@ import AnnouncementView from './features/announcements/AnnouncementView';
 import ClassGatewayManager from './features/smsGateways/ClassGatewayManager';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import TeacherResultReport from './features/results/TeacherResultReport';
 
 export default function App() {
   return (
@@ -343,6 +347,35 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+            {/* NECTA-style Division Performance reports (whole class / whole
+                school), matching the printed examination-centre format. */}
+            <Route
+              path="reports/division/school"
+              element={
+                <ProtectedRoute roles={['admin', 'headteacher']}>
+                  <SchoolDivisionReportPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="reports/division/class/:classId"
+              element={
+                <ProtectedRoute roles={['admin', 'headteacher']}>
+                  <ClassDivisionReportPage />
+                </ProtectedRoute>
+              }
+            />
+            {/* Division Summary + Top 10 Best/Lowest + Subject Performance
+                for one class in one exam — has its own class/exam pickers,
+                so no :classId param is needed here. */}
+            <Route
+              path="reports/class-analysis"
+              element={
+                <ProtectedRoute roles={['admin', 'headteacher', 'teacher', 'staff']}>
+                  <ClassAnalysisReportPage />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="attendance"
               element={
@@ -437,6 +470,16 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+
+            ...
+<Route
+  path="reports/teacher-performance"
+  element={
+    <ProtectedRoute roles={['admin', 'headteacher']}>
+      <TeacherResultReport />
+    </ProtectedRoute>
+  }
+/>
 
                         <Route
               path="sms-gateways"

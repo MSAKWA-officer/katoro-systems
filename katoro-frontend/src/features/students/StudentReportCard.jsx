@@ -5,7 +5,7 @@ import { academicYearsApi } from '../academicYears/academicYearsApi';
 import { termsApi } from '../terms/termsApi';
 import { examsApi } from '../exams/examsApi';
 
-const SCHOOL_NAME = 'UBUNGO ISLAMIC HIGH SCHOOL';
+const SCHOOL_NAME = 'LUPETA SECONDARY SCHOOL';
 const GRADE_POINTS = { A: 1, B: 2, C: 3, D: 4, F: 5 };
 const GRADE_REMARKS = { A: 'Excellent', B: 'Very Good', C: 'Good', D: 'Satisfactory', F: 'Fail' };
 
@@ -346,7 +346,7 @@ export default function StudentReportCard() {
               <div>
                 <p className="result-slip-school-name" style={{ fontSize: '14px' }}>{SCHOOL_NAME}</p>
                 <p className="result-slip-school-meta">
-                  P.O. Box 490, Katoro, Geite, Tanzania · Tel: +255 000 000 000 · info@school.example
+                  P.O. Box 4295, Mbeya City Council, MBEYA · 
                 </p>
               </div>
             </div>

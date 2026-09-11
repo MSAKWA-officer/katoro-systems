@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { UsersRound, Plus, Eye } from 'lucide-react';
 import { enrollmentsApi } from './enrollmentsApi';
@@ -18,6 +18,7 @@ export default function EnrollmentList() {
   // Form 2, ...) the class filter is pre-set and locked.
   const [filterYear, setFilterYear] = useState('');
   const [filterClass, setFilterClass] = useState(routeClassId || '');
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     fetchLookups();
@@ -76,6 +77,28 @@ export default function EnrollmentList() {
     if (!s) return '';
     return [s.first_name, s.middle_name, s.last_name].filter(Boolean).join(' ');
   }
+
+  // Always list enrollments by the student's admission number, regardless
+  // of the order the API returned them in. `numeric: true` sorts mixed
+  // letter/number admission numbers correctly (e.g. "S3137-0002" before
+  // "S3137-0010", not after it as plain string comparison would).
+  const sortedEnrollments = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    const filtered = term
+      ? enrollments.filter((en) => {
+          const name = studentName(en.Student).toLowerCase();
+          const admissionNumber = String(en.Student?.admission_number || '').toLowerCase();
+          return name.includes(term) || admissionNumber.includes(term);
+        })
+      : enrollments;
+
+    return [...filtered].sort((a, b) =>
+      String(a.Student?.admission_number || '').localeCompare(String(b.Student?.admission_number || ''), undefined, {
+        numeric: true,
+        sensitivity: 'base',
+      })
+    );
+  }, [enrollments, search]);
 
   return (
     <div className="p-4">
@@ -156,6 +179,13 @@ export default function EnrollmentList() {
               View this class's students
             </Link>
           )}
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by name or admission number..."
+            className="ml-auto w-64 rounded-md border border-slate-300 px-3 py-1.5 text-sm text-black outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          />
         </div>
 
         {loading && <p className="border-b border-slate-100 px-6 py-4 text-sm text-black">Loading...</p>}
@@ -166,6 +196,7 @@ export default function EnrollmentList() {
           <table className="w-full text-left text-sm">
             <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-black">
               <tr>
+                <th className="px-6 py-3 font-medium">Admission Number</th>
                 <th className="px-6 py-3 font-medium">Student</th>
                 <th className="px-6 py-3 font-medium">Class</th>
                 <th className="px-6 py-3 font-medium">Stream</th>
@@ -174,8 +205,9 @@ export default function EnrollmentList() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {enrollments.map((en) => (
+              {sortedEnrollments.map((en) => (
                 <tr key={en.id} className="hover:bg-slate-50">
+                  <td className="px-6 py-3 text-black">{en.Student?.admission_number || '—'}</td>
                   <td className="px-6 py-3 font-medium text-black">
                     {en.Student ? studentName(en.Student) : '—'}
                   </td>
@@ -218,12 +250,12 @@ export default function EnrollmentList() {
                   </td>
                 </tr>
               ))}
-              {enrollments.length === 0 && (
+              {sortedEnrollments.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="px-6 py-10 text-center text-black">
+                  <td colSpan="6" className="px-6 py-10 text-center text-black">
                     <div className="flex flex-col items-center gap-2">
                       <UsersRound size={22} className="text-slate-300" />
-                      No enrollments yet.
+                      {search.trim() ? 'No enrollments match your search.' : 'No enrollments yet.'}
                     </div>
                   </td>
                 </tr>
